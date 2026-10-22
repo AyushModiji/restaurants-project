@@ -16,27 +16,15 @@ export async function serverSupabase() {
       get(name: string) {
         return cookieStore.get(name)?.value;
       },
-      set(name: string, value: string, options: Record<string, unknown>) {
+      set(name: string, value: string, options: any) {
         try {
-          cookieStore.set({
-            name,
-            value,
-            ...options,
-          });
-        } catch {
-          // Cookies cannot be changed in every Server Component context.
-        }
+          cookieStore.set({ name, value, ...options });
+        } catch {}
       },
-      remove(name: string, options: Record<string, unknown>) {
+      remove(name: string, options: any) {
         try {
-          cookieStore.set({
-            name,
-            value: "",
-            ...options,
-          });
-        } catch {
-          // Cookie removal may require a Route Handler or Server Action.
-        }
+          cookieStore.set({ name, value: "", ...options });
+        } catch {}
       },
     },
   });
