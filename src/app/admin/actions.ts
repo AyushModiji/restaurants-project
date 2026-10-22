@@ -1,5 +1,5 @@
  "use server";
-import {revalidatePath} from "next/cache";import {redirect} from "next/navigation";import {serverSupabase} from "@/lib/supabase";
+import {revalidatePath} from "next/cache";import {redirect} from "next/navigation";import {serverSupabase} from "@/lib/supabase-server";
 async function admin(){const s=await serverSupabase(),{data:{user}}=await s.auth.getUser();if(!user)redirect("/admin/login");const allow=(process.env.ADMIN_EMAILS||"").split(",").map(x=>x.trim().toLowerCase());if(!user.email||!user.email_confirmed_at||!allow.includes(user.email.toLowerCase()))throw Error("Verified email is not authorised.");return s}
 export async function saveDraft(fd:FormData){const s=await admin();let content;try{content=JSON.parse(String(fd.get("content")||"{}"))}catch{throw Error("Invalid editor data")};const{error}=await s.from("site_drafts").upsert({id:1,content,updated_at:new Date().toISOString()});if(error)throw Error(error.message);revalidatePath("/admin")}
 export async function publish(){const s=await admin(),{data,error}=await s.from("site_drafts").select("content").eq("id",1).single();if(error)throw Error(error.message);const r=await s.from("published_site_content").upsert({id:1,content:data.content,updated_at:new Date().toISOString()});if(r.error)throw Error(r.error.message);revalidatePath("/");revalidatePath("/menu");revalidatePath("/admin")}
