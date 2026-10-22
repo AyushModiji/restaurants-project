@@ -13,20 +13,31 @@ export async function serverSupabase() {
 
   return createServerClient(url, key, {
     cookies: {
-      get(name) {
+      get(name: string) {
         return cookieStore.get(name)?.value;
       },
-      set(name, value, options) {
+      set(name: string, value: string, options: Record<string, unknown>) {
         try {
-          cookieStore.set({ name, value, ...options });
-        } catch {}
+          cookieStore.set({
+            name,
+            value,
+            ...options,
+          });
+        } catch {
+          // Cookies cannot be changed in every Server Component context.
+        }
       },
-      remove(name, options) {
+      remove(name: string, options: Record<string, unknown>) {
         try {
-          cookieStore.set({ name, value: "", ...options });
-        } catch {}
+          cookieStore.set({
+            name,
+            value: "",
+            ...options,
+          });
+        } catch {
+          // Cookie removal may require a Route Handler or Server Action.
+        }
       },
     },
   });
-    }
-          
+}
