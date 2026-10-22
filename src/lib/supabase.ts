@@ -1,4 +1,3 @@
-
 import { createBrowserClient } from "@supabase/ssr";
 
 export function browserSupabase() {
@@ -11,4 +10,3 @@ export function browserSupabase() {
 
   return createBrowserClient(url, key);
 }
-
